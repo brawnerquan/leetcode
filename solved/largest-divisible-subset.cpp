@@ -10,12 +10,15 @@ input                | expected
 if 1 is included it's part of the subset for sure
 note: each subset is built off the smalles non 1 integer? 
 */
+
 const int NO_ONE = -1;
+
 class Solution {
 public:
     vector<int> largestDivisibleSubset(vector<int>& nums) {
         if(nums.size() == 0)
             return nums;
+        
         //sort to guarentee that if the new prospective insert is divisible by the max it can be inserted
         sort(nums.begin(), nums.end());
         vector<lds_pair> lds;
@@ -35,19 +38,20 @@ public:
                         //track the previous element behind me and increase the LDS length
                         lds[i].my_length = lds[i - j].my_length + 1;
                         lds[i].behind_me = i - j;//store the index where this LDS is being built from
-                        lds[i].max_divisor = lds[i - j].max_divisor;//grab max
+                        
                         //since we're making a bigger LDS, check if this LDS is better than the current best
                         if(lds[i].my_length > longest_lds){
                             longest_lds = lds[i].my_length;
                             longest_lds_index = i;
                         }
+                            
                     }else{//if not we just move on
                         continue;
                     }
+
                     //if curr elem is greater than the max divisor, it must be the new max divisor for this subset
                     //or if the min_divisor is 1, we need to update it since 1 divides everything
-                    if(nums[i] > lds[i].max_divisor)
-                        lds[i].max_divisor = nums[i];
+                    lds[i].max_divisor = max(nums[i], lds[i - j].max_divisor);
                 }
             }
         }
@@ -56,18 +60,21 @@ public:
         build_lds(nums, lds, lds_solution, longest_lds, longest_lds_index);
         return lds_solution;
     }
+    
 private:
     struct lds_pair{
         int behind_me;
         int my_length;
         int max_divisor;  
     };
+    
     // void print_vector(vector<lds_pair> vec){
     //     for(int i = 0; i < vec.size(); i++){
     //         cout << vec[i].behind_me << ", ";
     //     }
     //     cout << endl;
     // }
+    
     void build_lds(vector<int> &nums, vector<lds_pair> &lds_info, vector<int> &lds, int length, int index){
             //while there are still indicies to keep following back
             while(index != NO_ONE){
