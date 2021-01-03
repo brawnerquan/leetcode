@@ -2,7 +2,61 @@
 // Author: https://github.com/brawnerquan
 // Time: O(nlogn) because each time we look at a new edge that can be added, the most work we have to do is logn reassignment of the smaller list of representatives
 // Space: O(n)
-// for whatever even though I implemented union find it's slow af but i spent way too much time coding this lol
+//cleaner implementation recoded... it appears the advantages of fully implementing union find aren't evident as shitty union find beats the runtime of this
+class Solution {
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        next_id = 0;
+        for(int i = 0; i < edges.size(); ++i){
+            if(find(edges[i][0]) == find(edges[i][1]))
+                return edges[i];
+            else
+                union_nodes(edges[i][0], edges[i][1]);
+        }
+        return vector<int>();
+    }
+    int find(int node){
+        //if this node doesn't have an id
+        if(node_map.find(node) == node_map.end()){
+            node_map[node] = next_id;
+            //now make it a rep and add itself to the vector
+            reps[next_id].push_back(node);
+            ++next_id;
+        }
+        return node_map[node];
+    }
+    void union_nodes(int left, int right){
+        //get reps
+        int left_rep = find(left);
+        int right_rep = find(right);
+        //if we need to merge left to right as right is bigger, swap L and R so we can always merge right to left
+        if(reps[left_rep].size() < reps[right_rep].size()){
+            int temp = left;
+            left = right;
+            right = left;
+            temp = left_rep;
+            left_rep = right_rep;
+            right_rep = temp;
+        }
+        //now merge right to left
+        for(int i = 0; i < reps[right_rep].size(); ++i){
+            //update the rep of the node
+            node_map[reps[right_rep][i]] = left_rep;
+            //now add it to the left node list
+            reps[left_rep].push_back(reps[right_rep][i]);
+        }
+        //now erase the right
+        reps.erase(right_rep);
+    }
+private:
+    int next_id;
+    //for a component id, starting at 0, contains all of the nodes it represents
+    unordered_map<int, vector<int>> reps;
+    //map to map nodes to component ids
+    unordered_map<int, int> node_map;
+};
+/*
+
 class Solution {
 public:
     vector<int> findRedundantConnection(vector<vector<int>>& edges) {
@@ -51,3 +105,4 @@ public:
         return vector<int>();
     }
 };
+*/
