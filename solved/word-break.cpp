@@ -39,3 +39,27 @@ public:
         return false;
     }
 };
+
+/* slower DP algorithm
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        unordered_set<string> dict;
+        //set up dict
+        for(int i = 0; i < wordDict.size(); ++i){
+            dict.insert(wordDict[i]);
+        }
+
+        vector<bool> dp(s.length() + 1);
+        dp[0] = true;
+
+        for(int i = 1; i <= s.length(); ++i){
+            for(int j = 0; j < i; ++j){
+                if(dp[j] == true and dict.find(s.substr(j, i - j)) != dict.end())
+                    dp[i] = true;
+            }
+        }
+        return dp[s.length()];
+    }
+};
+*/
